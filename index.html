@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Taxas de Cartão</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f4f9;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-6xl flex flex-col lg:flex-row transform transition-all duration-300 hover:scale-[1.01]">
+        
+        <!-- Left Column -->
+        <div class="lg:w-1/2 w-full lg:pr-8 mb-8 lg:mb-0">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Calculadora de Taxas de Cartão</h1>
+            <p class="text-gray-600 text-center mb-8">Insira o valor e selecione a bandeira do cartão para ver as taxas e os valores a receber.</p>
+
+            <div class="mb-6">
+                <label for="initialValue" class="block text-sm font-medium text-gray-700 mb-2">Valor da Venda</label>
+                <div class="relative rounded-lg shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 sm:text-sm">R$</span>
+                    </div>
+                    <input type="text" id="initialValue" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition duration-300 ease-in-out">
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-3">Selecione a Bandeira</label>
+                <div class="flex flex-wrap justify-center space-x-4 items-center">
+                    <div class="flex items-center space-x-2">
+                        <input type="radio" id="elo" name="cardBrand" value="elo" checked class="form-radio text-orange-500 focus:ring-orange-500">
+                        <label for="elo" class="text-gray-700 font-medium cursor-pointer">
+                            <img src="elo.jpg" alt="Logo Elo" class="h-6">
+                        </label>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="radio" id="mastercard" name="cardBrand" value="mastercard" class="form-radio text-orange-500 focus:ring-orange-500">
+                        <label for="mastercard" class="text-gray-700 font-medium cursor-pointer">
+                            <img src="master.jpg" alt="Logo Mastercard" class="h-6">
+                        </label>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="radio" id="visa" name="cardBrand" value="visa" class="form-radio text-orange-500 focus:ring-orange-500">
+                        <label for="visa" class="text-gray-700 font-medium cursor-pointer">
+                            <img src="visa.jpg" alt="Logo Visa" class="h-6">
+                        </label>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="radio" id="americanExpress" name="cardBrand" value="americanExpress" class="form-radio text-orange-500 focus:ring-orange-500">
+                        <label for="americanExpress" class="text-gray-700 font-medium cursor-pointer">
+                            <img src="amex.jpg" alt="Logo American Express" class="h-6">
+                        </label>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="radio" id="hipercard" name="cardBrand" value="hipercard" class="form-radio text-orange-500 focus:ring-orange-500">
+                        <label for="hipercard" class="text-gray-700 font-medium cursor-pointer">
+                            <img src="hiper.jpg" alt="Logo Hipercard" class="h-6">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center mb-8 space-x-4">
+                <button id="calculateBtn" class="bg-orange-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-orange-700 transition duration-300 ease-in-out">Calcular</button>
+                <button id="clearBtn" class="bg-gray-300 text-gray-800 font-bold py-3 px-8 rounded-lg shadow-md hover:bg-gray-400 transition duration-300 ease-in-out">Limpar</button>
+            </div>
+
+            <div id="results" class="hidden">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Débito Card -->
+                    <div id="debitCardContainer" class="bg-gray-50 rounded-lg p-6 shadow-inner border-l-4 border-orange-500">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Débito</h2>
+                        <p class="text-gray-600 mb-2">Valor a Receber</p>
+                        <p id="debitValue" class="font-bold text-orange-600 text-lg mb-2"></p>
+                        <p class="text-gray-600">Taxa: <span id="debitRate" class="font-semibold text-gray-800"></span></p>
+                    </div>
+
+                    <!-- Crédito Card -->
+                    <div class="bg-gray-50 rounded-lg p-6 shadow-inner border-l-4 border-orange-500">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Crédito</h2>
+                        <p class="text-gray-600 mb-2">Valor à Vista</p>
+                        <p id="creditValue" class="font-bold text-orange-600 text-lg mb-2"></p>
+                        <p class="text-gray-600">Taxa: <span id="creditRate" class="font-semibold text-gray-800"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Installments -->
+        <div class="lg:w-1/2 w-full">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Parcelamento Valores a Receber</h3>
+            <div id="installments" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <!-- Installments will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialValueInput = document.getElementById('initialValue');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const resultsDiv = document.getElementById('results');
+            const debitValueSpan = document.getElementById('debitValue');
+            const debitRateSpan = document.getElementById('debitRate');
+            const creditValueSpan = document.getElementById('creditValue');
+            const creditRateSpan = document.getElementById('creditRate');
+            const installmentsDiv = document.getElementById('installments');
+            const debitCardContainer = document.getElementById('debitCardContainer');
+            const cardBrandRadios = document.querySelectorAll('input[name="cardBrand"]');
+
+            // Data das taxas de juros
+            const cardRates = {
+                elo: {
+                    debit: { value: 987.20, rate: 1.28 },
+                    credit: {
+                        value: 961.36,
+                        rate: 3.86,
+                        installments: {
+                            '2x': { value: 951.51, rate: 4.85 },
+                            '3x': { value: 944.56, rate: 5.54 },
+                            '4x': { value: 937.61, rate: 6.24 },
+                            '5x': { value: 930.66, rate: 6.93 },
+                            '6x': { value: 923.71, rate: 7.63 },
+                            '7x': { value: 917.96, rate: 8.20 },
+                            '8x': { value: 911.01, rate: 8.90 },
+                            '9x': { value: 904.06, rate: 9.60 },
+                            '10x': { value: 897.11, rate: 10.29 },
+                            '11x': { value: 890.16, rate: 10.98 },
+                            '12x': { value: 883.21, rate: 11.68 },
+                        }
+                    }
+                },
+                mastercard: {
+                    debit: { value: 992.40, rate: 0.76 },
+                    credit: {
+                        value: 966.96,
+                        rate: 3.30,
+                        installments: {
+                            '2x': { value: 955.71, rate: 4.43 },
+                            '3x': { value: 948.76, rate: 5.12 },
+                            '4x': { value: 941.81, rate: 5.82 },
+                            '5x': { value: 934.86, rate: 6.51 },
+                            '6x': { value: 927.91, rate: 7.21 },
+                            '7x': { value: 918.46, rate: 8.20 },
+                            '8x': { value: 911.51, rate: 8.89 },
+                            '9x': { value: 904.56, rate: 9.59 },
+                            '10x': { value: 897.61, rate: 10.28 },
+                            '11x': { value: 890.66, rate: 10.98 },
+                            '12x': { value: 883.71, rate: 11.67 },
+                        }
+                    }
+                },
+                visa: {
+                    debit: { value: 991.80, rate: 0.82 },
+                    credit: {
+                        value: 966.26,
+                        rate: 3.37,
+                        installments: {
+                            '2x': { value: 958.11, rate: 4.19 },
+                            '3x': { value: 951.16, rate: 4.88 },
+                            '4x': { value: 944.21, rate: 5.58 },
+                            '5x': { value: 937.26, rate: 6.27 },
+                            '6x': { value: 930.31, rate: 6.97 },
+                            '7x': { value: 919.36, rate: 8.06 },
+                            '8x': { value: 912.41, rate: 8.76 },
+                            '9x': { value: 905.46, rate: 9.45 },
+                            '10x': { value: 898.51, rate: 10.15 },
+                            '11x': { value: 891.56, rate: 10.84 },
+                            '12x': { value: 884.61, rate: 11.54 },
+                        }
+                    }
+                },
+                americanExpress: {
+                    debit: { value: 0, rate: 0 },
+                    credit: {
+                        value: 957.16,
+                        rate: 4.28,
+                        installments: {
+                            '2x': { value: 944.21, rate: 5.58 },
+                            '3x': { value: 937.26, rate: 6.27 },
+                            '4x': { value: 930.31, rate: 6.97 },
+                            '5x': { value: 923.36, rate: 7.66 },
+                            '6x': { value: 916.41, rate: 8.36 },
+                            '7x': { value: 906.46, rate: 9.35 },
+                            '8x': { value: 899.51, rate: 10.05 },
+                            '9x': { value: 892.56, rate: 10.74 },
+                            '10x': { value: 885.61, rate: 11.44 },
+                            '11x': { value: 878.66, rate: 12.13 },
+                            '12x': { value: 871.71, rate: 12.83 },
+                        }
+                    }
+                },
+                hipercard: {
+                    debit: { value: 0, rate: 0 },
+                    credit: {
+                        value: 954.76,
+                        rate: 4.52,
+                        installments: {
+                            '2x': { value: 951.91, rate: 4.80 },
+                            '3x': { value: 944.96, rate: 5.50 },
+                            '4x': { value: 938.01, rate: 6.19 },
+                            '5x': { value: 931.06, rate: 6.89 },
+                            '6x': { value: 924.11, rate: 7.58 },
+                            '7x': { value: 906.96, rate: 9.30 },
+                            '8x': { value: 900.01, rate: 9.99 },
+                            '9x': { value: 893.06, rate: 10.69 },
+                            '10x': { value: 886.11, rate: 11.38 },
+                            '11x': { value: 879.16, rate: 12.08 },
+                            '12x': { value: 872.21, rate: 12.77 },
+                        }
+                    }
+                }
+            };
+            
+            function toggleDebitVisibility(brand) {
+                if (brand === 'americanExpress' || brand === 'hipercard') {
+                    debitCardContainer.classList.add('hidden');
+                } else {
+                    debitCardContainer.classList.remove('hidden');
+                }
+            }
+
+            function calculateRates() {
+                // Replace comma with dot for proper floating-point conversion
+                const inputValue = initialValueInput.value.replace(',', '.');
+                const initialValue = parseFloat(inputValue);
+                const cardBrand = document.querySelector('input[name="cardBrand"]:checked').value;
+                const rates = cardRates[cardBrand];
+
+                if (isNaN(initialValue) || initialValue <= 0) {
+                    const messageBox = document.createElement('div');
+                    messageBox.className = 'fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50';
+                    messageBox.innerHTML = `
+                        <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm">
+                            <p class="text-center text-lg font-semibold text-gray-800 mb-4">Atenção</p>
+                            <p class="text-center text-gray-600 mb-6">Por favor, insira um valor válido.</p>
+                            <button id="close-modal" class="w-full bg-orange-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-700 transition">OK</button>
+                        </div>
+                    `;
+                    document.body.appendChild(messageBox);
+                    document.getElementById('close-modal').addEventListener('click', () => {
+                        document.body.removeChild(messageBox);
+                    });
+                    return;
+                }
+
+                if (rates.debit.value > 0) {
+                    const debitReceived = (initialValue * rates.debit.value) / 1000;
+                    const debitRate = ((initialValue - debitReceived) / initialValue) * 100;
+                    debitValueSpan.textContent = `R$ ${debitReceived.toFixed(2).replace('.', ',')}`;
+                    debitRateSpan.textContent = `${debitRate.toFixed(2).replace('.', ',')}%`;
+                }
+
+
+                const creditReceived = (initialValue * rates.credit.value) / 1000;
+                const creditRate = ((initialValue - creditReceived) / initialValue) * 100;
+                creditValueSpan.textContent = `R$ ${creditReceived.toFixed(2).replace('.', ',')}`;
+                creditRateSpan.textContent = `${creditRate.toFixed(2).replace('.', ',')}%`;
+                
+                installmentsDiv.innerHTML = '';
+                for (const key in rates.credit.installments) {
+                    const installmentData = rates.credit.installments[key];
+                    const installmentReceived = (initialValue * installmentData.value) / 1000;
+                    const installmentRate = ((initialValue - installmentReceived) / initialValue) * 100;
+                    
+                    const installmentCard = document.createElement('div');
+                    installmentCard.className = 'bg-white rounded-lg p-4 shadow-sm border border-gray-200';
+                    installmentCard.innerHTML = `
+                        <p class="font-semibold text-gray-800">${key}</p>
+                        <p class="text-sm text-gray-600">Valor a Receber</p>
+                        <p class="font-bold text-orange-600">R$ ${installmentReceived.toFixed(2).replace('.', ',')}</p>
+                        <p class="text-xs text-gray-500">Taxa: <span class="font-medium">${installmentRate.toFixed(2).replace('.', ',')}%</span></p>
+                    `;
+                    installmentsDiv.appendChild(installmentCard);
+                }
+
+                resultsDiv.classList.remove('hidden');
+            }
+
+            calculateBtn.addEventListener('click', calculateRates);
+
+            clearBtn.addEventListener('click', () => {
+                initialValueInput.value = '';
+                resultsDiv.classList.add('hidden');
+            });
+            
+            cardBrandRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    toggleDebitVisibility(e.target.value);
+                    calculateRates();
+                });
+            });
+
+            // Initial check on page load
+            const initialBrand = document.querySelector('input[name="cardBrand"]:checked').value;
+            toggleDebitVisibility(initialBrand);
+            calculateRates();
+        });
+    </script>
+</body>
+</html>
