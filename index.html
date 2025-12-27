@@ -23,7 +23,7 @@
             <p class="text-gray-600 text-center mb-8">Insira o valor e selecione a bandeira do cartão para ver as taxas e os valores a receber.</p>
 
             <div class="mb-6">
-                <label for="initialValue" class="block text-sm font-medium text-gray-700 mb-2">Valor da Venda</label>
+                <label for="initialValue" class="block text-sm font-medium text-gray-700 mb-2">Valor da Venda - (Acrescentar a porcentagem referente a quantidade parcelada)</label>
                 <div class="relative rounded-lg shadow-sm">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">R$</span>
@@ -117,112 +117,100 @@
             const debitCardContainer = document.getElementById('debitCardContainer');
             const cardBrandRadios = document.querySelectorAll('input[name="cardBrand"]');
 
-            // Data das taxas de juros
+            // --- CONFIGURAÇÃO DE TAXAS (EM PORCENTAGEM) ---
+            // Edite os valores abaixo para ajustar as taxas de cada bandeira.
             const cardRates = {
                 elo: {
-                    debit: { value: 987.20, rate: 1.28 },
-                    credit: {
-                        value: 961.36,
-                        rate: 3.86,
-                        installments: {
-                            '2x': { value: 951.51, rate: 4.85 },
-                            '3x': { value: 944.56, rate: 5.54 },
-                            '4x': { value: 937.61, rate: 6.24 },
-                            '5x': { value: 930.66, rate: 6.93 },
-                            '6x': { value: 923.71, rate: 7.63 },
-                            '7x': { value: 917.96, rate: 8.20 },
-                            '8x': { value: 911.01, rate: 8.90 },
-                            '9x': { value: 904.06, rate: 9.60 },
-                            '10x': { value: 897.11, rate: 10.29 },
-                            '11x': { value: 890.16, rate: 10.98 },
-                            '12x': { value: 883.21, rate: 11.68 },
-                        }
+                    debit: 1.28,
+                    credit: 3.86,
+                    installments: {
+                        '2x': 5.00,
+                        '3x': 6.00,
+                        '4x': 6.00,
+                        '5x': 7.00,
+                        '6x': 8.00,
+                        '7x': 9.00,
+                        '8x': 10.00,
+                        '9x': 11.00,
+                        '10x': 12.00,
+                        '11x': 13.00,
+                        '12x': 14.00,
                     }
                 },
                 mastercard: {
-                    debit: { value: 992.40, rate: 0.76 },
-                    credit: {
-                        value: 966.96,
-                        rate: 3.30,
-                        installments: {
-                            '2x': { value: 955.71, rate: 4.43 },
-                            '3x': { value: 948.76, rate: 5.12 },
-                            '4x': { value: 941.81, rate: 5.82 },
-                            '5x': { value: 934.86, rate: 6.51 },
-                            '6x': { value: 927.91, rate: 7.21 },
-                            '7x': { value: 918.46, rate: 8.20 },
-                            '8x': { value: 911.51, rate: 8.89 },
-                            '9x': { value: 904.56, rate: 9.59 },
-                            '10x': { value: 897.61, rate: 10.28 },
-                            '11x': { value: 890.66, rate: 10.98 },
-                            '12x': { value: 883.71, rate: 11.67 },
-                        }
+                    debit: 0.76,
+                    credit: 3.30,
+                    installments: {
+                        '2x': 5.00,
+                        '3x': 5.00,
+                        '4x': 6.00,
+                        '5x': 7.00,
+                        '6x': 8.00,
+                        '7x': 9.00,
+                        '8x': 10.00,
+                        '9x': 11.00,
+                        '10x': 12.00,
+                        '11x': 13.00,
+                        '12x': 14.00,
                     }
                 },
                 visa: {
-                    debit: { value: 991.80, rate: 0.82 },
-                    credit: {
-                        value: 966.26,
-                        rate: 3.37,
-                        installments: {
-                            '2x': { value: 958.11, rate: 4.19 },
-                            '3x': { value: 951.16, rate: 4.88 },
-                            '4x': { value: 944.21, rate: 5.58 },
-                            '5x': { value: 937.26, rate: 6.27 },
-                            '6x': { value: 930.31, rate: 6.97 },
-                            '7x': { value: 919.36, rate: 8.06 },
-                            '8x': { value: 912.41, rate: 8.76 },
-                            '9x': { value: 905.46, rate: 9.45 },
-                            '10x': { value: 898.51, rate: 10.15 },
-                            '11x': { value: 891.56, rate: 10.84 },
-                            '12x': { value: 884.61, rate: 11.54 },
-                        }
+                    debit: 0.82,
+                    credit: 3.37,
+                    installments: {
+                        '2x': 5.00,
+                        '3x': 5.00,
+                        '4x': 6.00,
+                        '5x': 7.00,
+                        '6x': 8.00,
+                        '7x': 9.00,
+                        '8x': 10.00,
+                        '9x': 11.00,
+                        '10x': 12.00,
+                        '11x': 13.00,
+                        '12x': 14.00,
                     }
                 },
                 americanExpress: {
-                    debit: { value: 0, rate: 0 },
-                    credit: {
-                        value: 957.16,
-                        rate: 4.28,
-                        installments: {
-                            '2x': { value: 944.21, rate: 5.58 },
-                            '3x': { value: 937.26, rate: 6.27 },
-                            '4x': { value: 930.31, rate: 6.97 },
-                            '5x': { value: 923.36, rate: 7.66 },
-                            '6x': { value: 916.41, rate: 8.36 },
-                            '7x': { value: 906.46, rate: 9.35 },
-                            '8x': { value: 899.51, rate: 10.05 },
-                            '9x': { value: 892.56, rate: 10.74 },
-                            '10x': { value: 885.61, rate: 11.44 },
-                            '11x': { value: 878.66, rate: 12.13 },
-                            '12x': { value: 871.71, rate: 12.83 },
-                        }
+                    debit: 0, // 0 = Desativado
+                    credit: 4.28,
+                    installments: {
+                        '2x': 6.00,
+                        '3x': 7.00,
+                        '4x': 8.00,
+                        '5x': 8.00,
+                        '6x': 9.00,
+                        '7x': 10.00,
+                        '8x': 10.00,
+                        '9x': 11.00,
+                        '10x': 12.00,
+                        '11x': 13.00,
+                        '12x': 14.00,
                     }
                 },
                 hipercard: {
-                    debit: { value: 0, rate: 0 },
-                    credit: {
-                        value: 954.76,
-                        rate: 4.52,
-                        installments: {
-                            '2x': { value: 951.91, rate: 4.80 },
-                            '3x': { value: 944.96, rate: 5.50 },
-                            '4x': { value: 938.01, rate: 6.19 },
-                            '5x': { value: 931.06, rate: 6.89 },
-                            '6x': { value: 924.11, rate: 7.58 },
-                            '7x': { value: 906.96, rate: 9.30 },
-                            '8x': { value: 900.01, rate: 9.99 },
-                            '9x': { value: 893.06, rate: 10.69 },
-                            '10x': { value: 886.11, rate: 11.38 },
-                            '11x': { value: 879.16, rate: 12.08 },
-                            '12x': { value: 872.21, rate: 12.77 },
-                        }
+                    debit: 0, // 0 = Desativado
+                    credit: 4.52,
+                    installments: {
+                        '2x': 5.00,
+                        '3x': 6.00,
+                        '4x': 7.00,
+                        '5x': 8.00,
+                        '6x': 9.00,
+                        '7x': 10.00,
+                        '8x': 11.00,
+                        '9x': 12.00,
+                        '10x': 13.00,
+                        '11x': 14.00,
+                        '12x': 15.00,
                     }
                 }
             };
             
             function toggleDebitVisibility(brand) {
-                if (brand === 'americanExpress' || brand === 'hipercard') {
+                // Se a taxa de débito for 0, oculta a caixa de débito
+                const debitRate = cardRates[brand].debit;
+                if (debitRate === 0) {
                     debitCardContainer.classList.add('hidden');
                 } else {
                     debitCardContainer.classList.remove('hidden');
@@ -253,24 +241,28 @@
                     return;
                 }
 
-                if (rates.debit.value > 0) {
-                    const debitReceived = (initialValue * rates.debit.value) / 1000;
-                    const debitRate = ((initialValue - debitReceived) / initialValue) * 100;
+                // Cálculo Débito
+                if (rates.debit > 0) {
+                    const debitFeeAmount = initialValue * (rates.debit / 100);
+                    const debitReceived = initialValue - debitFeeAmount;
+                    
                     debitValueSpan.textContent = `R$ ${debitReceived.toFixed(2).replace('.', ',')}`;
-                    debitRateSpan.textContent = `${debitRate.toFixed(2).replace('.', ',')}%`;
+                    debitRateSpan.textContent = `${rates.debit.toFixed(2).replace('.', ',')}%`;
                 }
 
-
-                const creditReceived = (initialValue * rates.credit.value) / 1000;
-                const creditRate = ((initialValue - creditReceived) / initialValue) * 100;
-                creditValueSpan.textContent = `R$ ${creditReceived.toFixed(2).replace('.', ',')}`;
-                creditRateSpan.textContent = `${creditRate.toFixed(2).replace('.', ',')}%`;
+                // Cálculo Crédito à Vista
+                const creditFeeAmount = initialValue * (rates.credit / 100);
+                const creditReceived = initialValue - creditFeeAmount;
                 
+                creditValueSpan.textContent = `R$ ${creditReceived.toFixed(2).replace('.', ',')}`;
+                creditRateSpan.textContent = `${rates.credit.toFixed(2).replace('.', ',')}%`;
+                
+                // Cálculo Parcelado
                 installmentsDiv.innerHTML = '';
-                for (const key in rates.credit.installments) {
-                    const installmentData = rates.credit.installments[key];
-                    const installmentReceived = (initialValue * installmentData.value) / 1000;
-                    const installmentRate = ((initialValue - installmentReceived) / initialValue) * 100;
+                for (const key in rates.installments) {
+                    const installmentRate = rates.installments[key];
+                    const installmentFeeAmount = initialValue * (installmentRate / 100);
+                    const installmentReceived = initialValue - installmentFeeAmount;
                     
                     const installmentCard = document.createElement('div');
                     installmentCard.className = 'bg-white rounded-lg p-4 shadow-sm border border-gray-200';
@@ -303,7 +295,8 @@
             // Initial check on page load
             const initialBrand = document.querySelector('input[name="cardBrand"]:checked').value;
             toggleDebitVisibility(initialBrand);
-            calculateRates();
+            // Removido a chamada automática do cálculo ao carregar para não mostrar erro vazio
+            // calculateRates(); 
         });
     </script>
 </body>
