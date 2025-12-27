@@ -23,7 +23,7 @@
             <p class="text-gray-600 text-center mb-8">Insira o valor e selecione a bandeira do cartão para ver as taxas.</p>
 
             <div class="mb-6">
-                <label for="initialValue" class="block text-sm font-medium text-gray-700 mb-2">Preço a vista (Crédiario)</label>
+                <label for="initialValue" class="block text-sm font-medium text-gray-700 mb-2">Preço a vista ( Crediário)</label>
                 <div class="relative rounded-lg shadow-sm">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <span class="text-gray-500 sm:text-sm">R$</span>
@@ -32,12 +32,12 @@
                 </div>
             </div>
 
-            <!-- Novo Campo: Seletor de Parcelas e Preço com Taxa Repassada -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- Novo Layout: Seletor, Valor da Parcela e Total -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div>
-                    <label for="installmentSelect" class="block text-sm font-medium text-gray-700 mb-2">Qtd. Parcelas (Simulação)</label>
+                    <label for="installmentSelect" class="block text-sm font-medium text-gray-700 mb-2">Parcelas</label>
                     <div class="relative">
-                        <select id="installmentSelect" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none bg-white transition duration-300 text-gray-700">
+                        <select id="installmentSelect" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none bg-white transition duration-300 text-gray-700 text-sm">
                             <option value="debit">Débito</option>
                             <option value="1x">Crédito à Vista (1x)</option>
                             <option value="2x">2x</option>
@@ -58,12 +58,21 @@
                     </div>
                 </div>
                 <div>
-                    <label for="parceladoValue" class="block text-sm font-medium text-gray-700 mb-2">Preço Total Venda Parcelado</label>
+                    <label for="installmentValueDisplay" class="block text-sm font-medium text-gray-700 mb-2">Valor da Parcela</label>
                     <div class="relative rounded-lg shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span class="text-gray-500 sm:text-sm">R$</span>
+                            <span class="text-gray-500 sm:text-xs">R$</span>
                         </div>
-                        <input type="text" id="parceladoValue" readonly class="w-full pl-10 pr-4 py-2 border border-gray-300 bg-orange-50 rounded-lg focus:outline-none text-orange-700 font-bold">
+                        <input type="text" id="installmentValueDisplay" readonly class="w-full pl-8 pr-2 py-2 border border-gray-300 bg-orange-50 rounded-lg focus:outline-none text-orange-700 font-bold text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label for="parceladoValue" class="block text-sm font-medium text-gray-700 mb-2">Total Parcelado</label>
+                    <div class="relative rounded-lg shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-xs">R$</span>
+                        </div>
+                        <input type="text" id="parceladoValue" readonly class="w-full pl-8 pr-2 py-2 border border-gray-300 bg-orange-50 rounded-lg focus:outline-none text-orange-700 font-bold text-sm">
                     </div>
                 </div>
             </div>
@@ -152,6 +161,7 @@
             // Novos elementos
             const installmentSelect = document.getElementById('installmentSelect');
             const parceladoValueInput = document.getElementById('parceladoValue');
+            const installmentValueDisplay = document.getElementById('installmentValueDisplay');
 
             // --- CONFIGURAÇÃO DE TAXAS (EM PORCENTAGEM) ---
             // Edite os valores abaixo para ajustar as taxas de cada bandeira.
@@ -263,6 +273,7 @@
                 if (isNaN(initialValue) || initialValue <= 0) {
                     // Limpa o campo se valor for inválido, mas não mostra alerta se estiver vazio
                     parceladoValueInput.value = '';
+                    installmentValueDisplay.value = '';
                     if (initialValueInput.value !== '') {
                         const messageBox = document.createElement('div');
                         messageBox.className = 'fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50';
@@ -284,13 +295,17 @@
                 // --- NOVO CÁLCULO: Preço de Venda Parcelado (Soma Simples) ---
                 const selectedInstallment = installmentSelect.value;
                 let applicableRate = 0;
+                let numberOfInstallments = 1;
 
                 if (selectedInstallment === 'debit') {
                     applicableRate = rates.debit;
+                    numberOfInstallments = 1;
                 } else if (selectedInstallment === '1x') {
                     applicableRate = rates.credit;
+                    numberOfInstallments = 1;
                 } else {
                     applicableRate = rates.installments[selectedInstallment];
+                    numberOfInstallments = parseInt(selectedInstallment.replace('x', ''));
                 }
 
                 if (applicableRate > 0) {
@@ -298,10 +313,17 @@
                     // Exemplo: 100 + 12% = 112.00
                     const grossPrice = initialValue * (1 + (applicableRate / 100));
                     parceladoValueInput.value = `R$ ${grossPrice.toFixed(2).replace('.', ',')}`;
+                    
+                    // Cálculo Valor da Parcela
+                    const valuePerInstallment = grossPrice / numberOfInstallments;
+                    installmentValueDisplay.value = `R$ ${valuePerInstallment.toFixed(2).replace('.', ',')}`;
+
                 } else if (applicableRate === 0 && selectedInstallment === 'debit' && rates.debit === 0) {
                     parceladoValueInput.value = 'Indisponível';
+                    installmentValueDisplay.value = '---';
                 } else {
                     parceladoValueInput.value = '---';
+                    installmentValueDisplay.value = '---';
                 }
 
 
@@ -336,6 +358,7 @@
             clearBtn.addEventListener('click', () => {
                 initialValueInput.value = '';
                 parceladoValueInput.value = '';
+                installmentValueDisplay.value = '';
                 resultsDiv.classList.add('hidden');
             });
             
